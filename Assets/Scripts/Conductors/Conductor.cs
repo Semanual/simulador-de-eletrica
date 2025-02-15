@@ -7,5 +7,5 @@ public enum Polarity {
 
 public abstract class Conductor : MonoBehaviour {
     public abstract Conductor[] GetConnectedConductors(Conductor from);
-    public Polarity polarity;
+    [HideInInspector] public Polarity polarity;
 }

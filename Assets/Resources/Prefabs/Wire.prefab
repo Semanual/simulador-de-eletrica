@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 615f24347e640e4de98ebb079d1f58e1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -100,6 +100,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polarity: 0
-  resolution: 0
-  radius: 0
-  polarity: 0
+  resolution: 8
+  radius: 0.025

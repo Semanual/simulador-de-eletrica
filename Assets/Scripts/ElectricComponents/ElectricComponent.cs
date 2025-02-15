@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
@@ -15,7 +16,7 @@ public class EndpointAttribute : Attribute {
 public abstract class ElectricComponent : MonoBehaviour {
     public virtual bool IsGenerator => false;
     protected virtual void Awake() {
-        IEnumerable<FieldInfo> fields = GetType().GetFields();
+        IEnumerable<FieldInfo> fields = GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo field in fields) {
             Attribute attribute = field.GetCustomAttribute(typeof(EndpointAttribute));
             if (attribute == null || attribute is not EndpointAttribute endpointAttribute) {
@@ -34,6 +35,7 @@ public abstract class ElectricComponent : MonoBehaviour {
                     subEndpoint.component = this;
                     subEndpoint.polarity = endpointAttribute.polarity;
                 }
+                continue;
             }
 
             Debug.LogError($"Uso incorreto do atributo EndpointAttribute na variável {field.Name} do componente {GetType().Name}; Só pode ser usado em Endpoints ou coleções de Endpoints");

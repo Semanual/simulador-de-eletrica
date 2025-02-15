@@ -45,12 +45,12 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         }
 
         Vector3 worldMousePosition = GetWorldMousePosition();
-        
+
         if (wire != null) {
-            Destroy(wire);
+            Destroy(wire.gameObject);
         }
 
-        wire = Instantiate(wirePrefab, transform.position, Quaternion.identity);
+        wire = Instantiate(wirePrefab);
         wire.StartPosition = transform.TransformPoint(wirePositionLocalOffset);
         wire.EndPosition = worldMousePosition;
         isMovingWire = true;
@@ -80,14 +80,26 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         GetWorldMousePosition(out Ray ray);
 
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity)) {
+            Destroy(wire.gameObject);
+            wire = null;
             return;
         }
 
         if (hit.collider == null) {
+            Destroy(wire.gameObject);
+            wire = null;
             return;
         }
 
         if (!hit.collider.gameObject.TryGetComponent(out Endpoint endPoint)) {
+            Destroy(wire.gameObject);
+            wire = null;
+            return;
+        }
+
+        if (endPoint == this) {
+            Destroy(wire.gameObject);
+            wire = null;
             return;
         }
 

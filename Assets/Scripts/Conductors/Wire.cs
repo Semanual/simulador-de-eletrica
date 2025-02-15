@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using UnityEngine;
 
@@ -9,7 +10,6 @@ public class Wire : Conductor {
     public const string PREFAB_PATH = "Prefabs/Wire";
     [SerializeField] int resolution;
     [SerializeField] float radius;
-    public new Polarity polarity = Polarity.NONE;
     MeshFilter meshFilter;
     Vector3 startPosition;
     public Vector3 StartPosition {
@@ -20,6 +20,7 @@ public class Wire : Conductor {
             }
 
             startPosition = value;
+            Debug.Log(startPosition);
 
             meshFilter.mesh = GetWireMesh(startPosition, endPosition, resolution, radius);
         }
@@ -45,6 +46,7 @@ public class Wire : Conductor {
             if (value == startConductor) {
                 return;
             }
+
             startConductor = value;
             GeneratorManager.Singleton.RefreshConductors();
         }
@@ -56,26 +58,28 @@ public class Wire : Conductor {
             if (value == endConductor) {
                 return;
             }
+
             endConductor = value;
             GeneratorManager.Singleton.RefreshConductors();
         }
     }
 
     void Awake() {
+        polarity = Polarity.NONE;
         meshFilter = GetComponent<MeshFilter>();
     }
 
     static Mesh GetWireMesh(Vector3 start, Vector3 end, int wireResolution, float radius) {
-        List<Vector3> startCircle = GetCircle(radius, wireResolution, start).ToList();
-        List<Vector3> endCircle = GetCircle(radius, wireResolution, end).ToList();
-        startCircle.Add(start);
-        endCircle.Add(end);
+        List<Vector3> baseCircle = GetCircle(radius, wireResolution, start, end - start).ToList();
+        List<Vector3> topCircle = GetCircle(radius, wireResolution, end, end - start).ToList();
+        baseCircle.Add(start);
+        topCircle.Add(end);
 
-        Vector3[] vertices = startCircle.Concat(endCircle).ToArray();
+        Vector3[] vertices = baseCircle.Concat(topCircle).ToArray();
 
-        int startCenterPos = startCircle.Count - 1;
-        int endOffset = startCircle.Count;
-        int endCenterPos = endCircle.Count - 1;
+        int baseCenterPos = baseCircle.Count - 1;
+        int topOffset = baseCircle.Count;
+        int topCenterPos = baseCircle.Count + topCircle.Count - 1;
 
         // Quantidade de arestas da base em polígolo regular = quantidade de vértices da base
         // Quantidade de faces = Quantidade de arestas (juntam no meio)
@@ -90,30 +94,42 @@ public class Wire : Conductor {
 
         for (int i = 0; i < wireResolution; i++) {
             int triangleIndex = i * 3;
+
+            int nextBaseVertex = i + 1;
+            if (nextBaseVertex == baseCenterPos) {
+                nextBaseVertex = 0;
+            }
+
+            int nextTopVertex = topOffset + i + 1;
+            if (nextTopVertex == topCenterPos) {
+                nextTopVertex = topOffset;
+            }
+
             // Base
             int triangleBaseIndex = triangleBaseOffset + triangleIndex;
 
-            triangles[triangleBaseIndex] = startCenterPos;
-            triangles[triangleBaseIndex + 1] = i;
-            triangles[triangleBaseIndex + 2] = i + 1;
+            triangles[triangleBaseIndex] = baseCenterPos;
+            triangles[triangleBaseIndex + 1] = nextBaseVertex;
+            triangles[triangleBaseIndex + 2] = i;
 
             // Meio
-            int triangleMiddleIndex = triangleMiddleOffset + triangleIndex;
+            int triangleMiddleBottomIndex = triangleMiddleOffset + triangleIndex;
+            int triangleMiddleTopIndex = triangleMiddleOffset * 2 + triangleIndex;
 
-            triangles[triangleMiddleIndex] = i;
-            triangles[triangleMiddleIndex + 1] = i + 1;
-            triangles[triangleMiddleIndex + 2] = endOffset + i;
+            triangles[triangleMiddleBottomIndex] = i;
+            triangles[triangleMiddleBottomIndex + 1] = nextBaseVertex;
+            triangles[triangleMiddleBottomIndex + 2] = topOffset + i;
 
-            triangles[triangleMiddleIndex + 3] = endOffset + i;
-            triangles[triangleMiddleIndex + 4] = endOffset + i + 1;
-            triangles[triangleMiddleIndex + 5] = i + 1;
+            triangles[triangleMiddleTopIndex] = topOffset + i;
+            triangles[triangleMiddleTopIndex + 1] = nextBaseVertex;
+            triangles[triangleMiddleTopIndex + 2] = nextTopVertex;
 
             // Topo
             int triangleTopIndex = triangleTopOffset + triangleIndex;
 
-            triangles[triangleTopIndex] = endCenterPos;
-            triangles[triangleTopIndex + 1] = endOffset + i;
-            triangles[triangleTopIndex + 2] = endOffset + i + 1;
+            triangles[triangleTopIndex] = topCenterPos;
+            triangles[triangleTopIndex + 1] = topOffset + i;
+            triangles[triangleTopIndex + 2] = nextTopVertex;
         }
 
         Mesh mesh = new() {
@@ -124,12 +140,13 @@ public class Wire : Conductor {
         return mesh;
     }
 
-    static Vector3[] GetCircle(float radius, int resolution, Vector3 center) {
+    static Vector3[] GetCircle(float radius, int resolution, Vector3 center, Vector3 direction) {
         Vector2[] circle = GetCircle(radius, resolution);
         Vector3[] vertices = new Vector3[resolution];
+        Quaternion rotateToDirection = Quaternion.FromToRotation(Vector3.forward, direction);
 
         for (int i = 0; i < resolution; i++) {
-            vertices[i] = new Vector3(circle[i].x, circle[i].y) + center;
+            vertices[i] = rotateToDirection * new Vector3(circle[i].x, circle[i].y) + center;
         }
 
         return vertices;
