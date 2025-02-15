@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
     [HideInInspector] public ElectricComponent component;
     [SerializeField] bool canPullWire = true;
+    [SerializeField] Vector3 wirePositionLocalOffset;
     public Wire wire = null;
     Wire wirePrefab;
     Plane wirePlane;
@@ -50,7 +51,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         }
 
         wire = Instantiate(wirePrefab, transform.position, Quaternion.identity);
-        wire.StartPosition = worldMousePosition;
+        wire.StartPosition = transform.TransformPoint(wirePositionLocalOffset);
         wire.EndPosition = worldMousePosition;
         isMovingWire = true;
         wire.StartConductor = this;

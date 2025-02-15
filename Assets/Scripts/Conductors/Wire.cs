@@ -4,8 +4,9 @@ using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
 public class Wire : Conductor {
-    public const string PREFAB_PATH = "Prefabs/Wire.prefab";
+    public const string PREFAB_PATH = "Prefabs/Wire";
     [SerializeField] int resolution;
     [SerializeField] float radius;
     public new Polarity polarity = Polarity.NONE;
@@ -58,6 +59,10 @@ public class Wire : Conductor {
             endConductor = value;
             GeneratorManager.Singleton.RefreshConductors();
         }
+    }
+
+    void Awake() {
+        meshFilter = GetComponent<MeshFilter>();
     }
 
     static Mesh GetWireMesh(Vector3 start, Vector3 end, int wireResolution, float radius) {

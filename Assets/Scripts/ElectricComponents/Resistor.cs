@@ -1,6 +1,8 @@
 using UnityEngine;
 public class Resistor : ElectricComponent {
+    [Endpoint(Polarity.POSITIVE)]
     [SerializeField] Endpoint positiveTerminal;
+    [Endpoint(Polarity.NEGATIVE)]
     [SerializeField] Endpoint negativeTerminal;
     [SerializeField] Animator animator;
 

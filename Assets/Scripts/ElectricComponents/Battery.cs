@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public abstract class Battery : BaseGenerator {
+public class Battery : BaseGenerator {
+    [Endpoint(Polarity.POSITIVE)]
     [SerializeField] Endpoint positiveTerminal;
+    [Endpoint(Polarity.NEGATIVE)]
     [SerializeField] Endpoint negativeTerminal;
-    protected override void Awake() {
-        RegisterEndpointsComponent(new Endpoint[] {positiveTerminal, negativeTerminal});
-    }
 
     public override Endpoint[] GetPoweredOutputEndpoints() {
         return new Endpoint[] { positiveTerminal };
