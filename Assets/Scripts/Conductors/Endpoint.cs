@@ -32,9 +32,6 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
 
         Conductor[] positive = component.GetPoweredOutputEndpoints().Where(endpoint => endpoint != this).ToArray();
         Conductor[] negative = wire != null && wire != from ? new Conductor[] { wire } : new Conductor[0];
-        Debug.Log(polarity);
-        Debug.Log(positive.ToDebugString());
-        Debug.Log(negative.ToDebugString());
 
         return polarity switch {
             Polarity.POSITIVE => positive,

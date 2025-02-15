@@ -47,10 +47,8 @@ public abstract class ElectricComponent : MonoBehaviour {
     public virtual void SetPowered(bool powered, BaseGenerator by) {
         if (powered) {
             poweredBy.Add(by);
-            Debug.Log("Adicionado " + by.name);
         } else {
             poweredBy.Remove(by);
-            Debug.Log("Removido " + by.name);
         }
     }
     readonly protected HashSet<BaseGenerator> poweredBy = new();

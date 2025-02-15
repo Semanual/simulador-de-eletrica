@@ -28,28 +28,23 @@ public class Battery : BaseGenerator {
 
         while (conductorsToVisit.Count > 0) {
             Conductor conductor = conductorsToVisit.Dequeue();
-            Debug.Log(conductor);
-            Debug.Log($"{conductor.transform.parent?.name}: {conductor.name}");
             Conductor[] connectedConductors = conductor.GetConnectedConductors();
             foreach (Conductor connected in connectedConductors) {
                 if (usedConductors.Contains(connected)) {
                     continue;
                 }
 
-                Debug.Log("We should visit " + connected?.name);
                 conductorsToVisit.Enqueue(connected);
                 usedConductors.Add(connected);
             }
 
             if (conductor == negativeTerminal) {
-                Debug.Log("ESTOU DE VOLTA!");
                 isPowered = true;
                 break;
             }
         }
 
         bool hasResistance = false;
-        Debug.Log("Ligado? " + isPowered);
         HashSet<ElectricComponent> componentsInsideCircuit = new();
         foreach (Conductor conductor in usedConductors) {
             if (conductor is not Endpoint endpoint) {
@@ -69,10 +64,9 @@ public class Battery : BaseGenerator {
             if (endpoint.component.HasResistance) {
                 hasResistance = true;
             }
-            Debug.Log("Definindo isPowered de " + endpoint.component.name + " como " + isPowered);
         }
 
-        foreach (ElectricComponent componentOutsideCircuit in powering.Where(x => !componentsInsideCircuit.Contains(x))) {
+        foreach (ElectricComponent componentOutsideCircuit in powering.Where(x => !componentsInsideCircuit.Contains(x)).ToArray()) {
             componentOutsideCircuit.SetPowered(false, this);
             powering.Remove(componentOutsideCircuit);
         }

@@ -13,8 +13,6 @@ public class Resistor : ElectricComponent {
 
     public override void SetPowered(bool isPowered, BaseGenerator by) {
         base.SetPowered(isPowered, by);
-        Debug.Log(isPowered);
-        Debug.Log(poweredBy.ToDebugString());
         bool isStillPowered = poweredBy.Count > 0;
         animator.SetBool("isPowered", isStillPowered);
     }
