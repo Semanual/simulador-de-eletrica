@@ -104,6 +104,7 @@ MonoBehaviour:
   component: {fileID: 0}
   canPullWire: 1
   wirePositionLocalOffset: {x: 0, y: 0, z: -0.016}
+  pointInput: {fileID: -1654692200621890270, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   wire: {fileID: 0}
 --- !u!65 &1030568667286942399
 BoxCollider:

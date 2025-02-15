@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 public class Switch : ElectricComponent, IPointerDownHandler {
@@ -21,5 +22,9 @@ public class Switch : ElectricComponent, IPointerDownHandler {
     public void OnPointerDown(PointerEventData eventData) {
         isOn = !isOn;
         animator.SetBool("isOn", isOn);
+        if (terminals.Any(terminal => terminal.wire == null)) {
+            return;
+        }
+        GeneratorManager.Singleton.RefreshConductors();
     }
 }

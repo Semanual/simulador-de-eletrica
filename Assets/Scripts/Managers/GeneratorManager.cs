@@ -14,6 +14,10 @@ public class GeneratorManager : MonoBehaviour {
         Singleton = this;
     }
 
+    void Start() {
+        RefreshConductors();
+    }
+
     public void Register(BaseGenerator generator) {
         if (!generator.IsGenerator) {
             Debug.LogError("Tentou registrar um não gerador como gerador: " + generator.name);

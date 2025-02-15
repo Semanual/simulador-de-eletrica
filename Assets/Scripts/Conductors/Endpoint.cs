@@ -7,6 +7,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
     [HideInInspector] public ElectricComponent component;
     [SerializeField] bool canPullWire = true;
     [SerializeField] Vector3 wirePositionLocalOffset;
+    [SerializeField] InputActionReference pointInput;
     public Wire wire = null;
     Wire wirePrefab;
     Plane wirePlane;
@@ -23,7 +24,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         }
     }
 
-    public override Conductor[] GetConnectedConductors(Conductor from) {
+    public override Conductor[] GetConnectedConductors(Conductor from = null) {
         if (component == null) {
             Debug.LogError("Endpoint não registrado por um componente elétrico: " + name);
             return null;
@@ -31,6 +32,9 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
 
         Conductor[] positive = component.GetPoweredOutputEndpoints().Where(endpoint => endpoint != this).ToArray();
         Conductor[] negative = wire != null && wire != from ? new Conductor[] { wire } : new Conductor[0];
+        Debug.Log(polarity);
+        Debug.Log(positive.ToDebugString());
+        Debug.Log(negative.ToDebugString());
 
         return polarity switch {
             Polarity.POSITIVE => positive,
@@ -51,7 +55,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         }
 
         wire = Instantiate(wirePrefab);
-        wire.StartPosition = transform.TransformPoint(wirePositionLocalOffset);
+        wire.StartPosition = GetConnectionPoint();
         wire.EndPosition = worldMousePosition;
         isMovingWire = true;
         wire.StartConductor = this;
@@ -62,7 +66,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
     }
 
     Vector3 GetWorldMousePosition(out Ray ray) {
-        ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        ray = Camera.main.ScreenPointToRay(pointInput.action.ReadValue<Vector2>());
 
         if (!wirePlane.Raycast(ray, out float distance)) {
             Debug.LogError("Plano é paralelo ao raio, ou está atrás da câmera" + name);
@@ -91,20 +95,25 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
             return;
         }
 
-        if (!hit.collider.gameObject.TryGetComponent(out Endpoint endPoint)) {
+        if (!hit.collider.gameObject.TryGetComponent(out Endpoint endpoint)) {
             Destroy(wire.gameObject);
             wire = null;
             return;
         }
 
-        if (endPoint == this) {
+        if (endpoint == this) {
             Destroy(wire.gameObject);
             wire = null;
             return;
         }
 
-        endPoint.wire = wire;
-        wire.EndConductor = endPoint;
+        endpoint.wire = wire;
+        wire.EndConductor = endpoint;
+        wire.EndPosition = endpoint.GetConnectionPoint();
         isMovingWire = false;
+    }
+    
+    public Vector3 GetConnectionPoint() {
+        return transform.TransformPoint(wirePositionLocalOffset);
     }
 }

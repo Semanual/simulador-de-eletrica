@@ -15,6 +15,7 @@ public class EndpointAttribute : Attribute {
 
 public abstract class ElectricComponent : MonoBehaviour {
     public virtual bool IsGenerator => false;
+    public virtual bool HasResistance { get; } = false;
     protected virtual void Awake() {
         IEnumerable<FieldInfo> fields = GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo field in fields) {
@@ -43,5 +44,14 @@ public abstract class ElectricComponent : MonoBehaviour {
     }
 
     public abstract Endpoint[] GetPoweredOutputEndpoints();
-    public virtual void SetPowered(bool powered) {}
+    public virtual void SetPowered(bool powered, BaseGenerator by) {
+        if (powered) {
+            poweredBy.Add(by);
+            Debug.Log("Adicionado " + by.name);
+        } else {
+            poweredBy.Remove(by);
+            Debug.Log("Removido " + by.name);
+        }
+    }
+    readonly protected HashSet<BaseGenerator> poweredBy = new();
 }

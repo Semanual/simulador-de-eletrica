@@ -20,8 +20,6 @@ public class Wire : Conductor {
             }
 
             startPosition = value;
-            Debug.Log(startPosition);
-
             meshFilter.mesh = GetWireMesh(startPosition, endPosition, resolution, radius);
         }
     }
@@ -165,13 +163,20 @@ public class Wire : Conductor {
         return vertices;
     }
 
-    public override Conductor[] GetConnectedConductors(Conductor from) {
+    public override Conductor[] GetConnectedConductors(Conductor from = null) {
+        IEnumerable<Conductor> conductors = new Conductor[] {StartConductor, EndConductor};
+        conductors = conductors.Where(x => x != null);
+
+        if (from == null) {
+            return conductors.ToArray();
+        }
+
         if (from == StartConductor) {
-            return new Conductor[] {EndConductor};
+            return conductors.Where(x => x != StartConductor).ToArray();
         }
 
         if (from == EndConductor) {
-            return new Conductor[] {StartConductor};
+            return conductors.Where(x => x != EndConductor).ToArray();
         }
 
         return new Conductor[0];

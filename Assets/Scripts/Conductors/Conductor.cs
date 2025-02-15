@@ -6,6 +6,6 @@ public enum Polarity {
 };
 
 public abstract class Conductor : MonoBehaviour {
-    public abstract Conductor[] GetConnectedConductors(Conductor from);
-    [HideInInspector] public Polarity polarity;
+    public abstract Conductor[] GetConnectedConductors(Conductor from = null);
+    [HideInInspector] public Polarity polarity = Polarity.NONE;
 }
