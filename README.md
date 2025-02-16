@@ -7,6 +7,7 @@
 - Associação de geradores limitada a geradores em série de mesma polaridade;
 - Callbacks para definir o que fazer quando um componente está em curto circuito;
 - Modelo de circuito a partir de princípios físicos (como lei de Ohm e associação de resistores);
+- Ao clicar em algumas coisas (como o abajur e a fonte), é dado um zoom para melhor visualização
 - Testado em Android e WebGl, funcionam como esperado.
 ## Tecnologias utilizadas
 - Unity 6000.0.36f1
