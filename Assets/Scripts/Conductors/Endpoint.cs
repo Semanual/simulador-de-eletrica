@@ -8,7 +8,25 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
     [SerializeField] bool canPullWire = true;
     [SerializeField] Vector3 wirePositionLocalOffset;
     [SerializeField] InputActionReference pointInput;
-    public Wire wire = null;
+    Wire wire = null;
+    public Wire Wire {
+        get => wire;
+        set {
+            if (wire == value) {
+                return;
+            }
+            
+            if (wire != null) {
+                if (wire.StartConductor != null && wire.StartConductor is Endpoint startConductor) {
+                    startConductor.wire = null;
+                } else if (wire.StartConductor != null && wire.StartConductor is Endpoint endConductor) {
+                    endConductor.wire = null;
+                }
+                Destroy(wire.gameObject);
+            }
+            wire = value;
+        }
+    }
     Wire wirePrefab;
     Plane wirePlane;
     bool isMovingWire = false;
@@ -18,9 +36,9 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
     }
 
     void Update() {
-        if (isMovingWire && wire != null) {
+        if (isMovingWire && Wire != null) {
             Vector3 worldMousePosition = GetWorldMousePosition();
-            wire.EndPosition = worldMousePosition;
+            Wire.EndPosition = worldMousePosition;
         }
     }
 
@@ -31,7 +49,7 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         }
 
         Conductor[] positive = component.GetPoweredOutputEndpoints().Where(endpoint => endpoint != this).ToArray();
-        Conductor[] negative = wire != null && wire != from ? new Conductor[] { wire } : new Conductor[0];
+        Conductor[] negative = Wire != null && Wire != from ? new Conductor[] { Wire } : new Conductor[0];
 
         return polarity switch {
             Polarity.POSITIVE => positive,
@@ -47,15 +65,15 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
 
         Vector3 worldMousePosition = GetWorldMousePosition();
 
-        if (wire != null) {
-            Destroy(wire.gameObject);
+        if (Wire != null) {
+            Destroy(Wire.gameObject);
         }
 
-        wire = Instantiate(wirePrefab);
-        wire.StartPosition = GetConnectionPoint();
-        wire.EndPosition = worldMousePosition;
+        Wire = Instantiate(wirePrefab);
+        Wire.StartPosition = GetConnectionPoint();
+        Wire.EndPosition = worldMousePosition;
         isMovingWire = true;
-        wire.StartConductor = this;
+        Wire.StartConductor = this;
     }
 
     Vector3 GetWorldMousePosition() {
@@ -81,32 +99,28 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
         GetWorldMousePosition(out Ray ray);
 
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity)) {
-            Destroy(wire.gameObject);
-            wire = null;
+            Wire = null;
             return;
         }
 
         if (hit.collider == null) {
-            Destroy(wire.gameObject);
-            wire = null;
+            Wire = null;
             return;
         }
 
         if (!hit.collider.gameObject.TryGetComponent(out Endpoint endpoint)) {
-            Destroy(wire.gameObject);
-            wire = null;
+            Wire = null;
             return;
         }
 
         if (endpoint == this) {
-            Destroy(wire.gameObject);
-            wire = null;
+            Wire = null;
             return;
         }
 
-        endpoint.wire = wire;
-        wire.EndConductor = endpoint;
-        wire.EndPosition = endpoint.GetConnectionPoint();
+        endpoint.Wire = Wire;
+        Wire.EndConductor = endpoint;
+        Wire.EndPosition = endpoint.GetConnectionPoint();
         isMovingWire = false;
     }
     

@@ -22,7 +22,7 @@ public class Switch : ElectricComponent, IPointerDownHandler {
     public void OnPointerDown(PointerEventData eventData) {
         isOn = !isOn;
         animator.SetBool("isOn", isOn);
-        if (terminals.Any(terminal => terminal.wire == null)) {
+        if (terminals.Any(terminal => terminal.Wire == null)) {
             return;
         }
         GeneratorManager.Singleton.RefreshConductors();
