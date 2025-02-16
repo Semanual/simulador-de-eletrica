@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 public abstract class BaseGenerator : ElectricComponent {
     readonly protected HashSet<ElectricComponent> powering = new();
-    public override bool IsGenerator => true;
+    [SerializeField] bool isMainGenerator = true;
+    public float electromotiveForce = 10;
     public abstract void Refresh();
-    public abstract void ShortCircuit(bool isShortCircuited);
     protected virtual void Start() {
-        GeneratorManager.Singleton.Register(this);
+        if (isMainGenerator) {
+            GeneratorManager.Singleton.Register(this);
+        }
     }
 }

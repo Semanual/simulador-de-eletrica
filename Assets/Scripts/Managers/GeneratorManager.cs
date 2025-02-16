@@ -19,11 +19,6 @@ public class GeneratorManager : MonoBehaviour {
     }
 
     public void Register(BaseGenerator generator) {
-        if (!generator.IsGenerator) {
-            Debug.LogError("Tentou registrar um não gerador como gerador: " + generator.name);
-            return;
-        }
-
         generators.Add(generator);
     }
 

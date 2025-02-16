@@ -13,9 +13,20 @@ public class EndpointAttribute : Attribute {
     }
 }
 
-public abstract class ElectricComponent : MonoBehaviour {
-    public virtual bool IsGenerator => false;
-    public virtual bool HasResistance { get; } = false;
+public abstract class ElectricComponent : MonoBehaviour, IElectric {
+    [field: SerializeField] public float resistance { get; set; }
+    [field: SerializeField] public float consumesTension { get; set; }
+    [field: SerializeField] public float consumesCurrent { get; set; }
+    public float receivingTension { get; set; }
+    public float receivingCurrent { get; set; }
+    [SerializeField] float maxPower;
+    bool isShortCircuited = false;
+    bool isPowered;
+    public virtual void ShortCircuit(bool isShortCircuited) {}
+    public abstract Endpoint[] GetPoweredOutputEndpoints();
+    public virtual void SetPowered(bool isPowered) {}
+    public Circuit circuit = null;
+
     protected virtual void Awake() {
         IEnumerable<FieldInfo> fields = GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo field in fields) {
@@ -43,13 +54,18 @@ public abstract class ElectricComponent : MonoBehaviour {
         }
     }
 
-    public abstract Endpoint[] GetPoweredOutputEndpoints();
-    public virtual void SetPowered(bool powered, BaseGenerator by) {
-        if (powered) {
-            poweredBy.Add(by);
-        } else {
-            poweredBy.Remove(by);
+    public virtual void UpdateValues() {
+        bool currentIsPowered = receivingTension >= consumesTension && receivingCurrent >= consumesCurrent && circuit != null;
+        bool isCurrentAboveLimit = circuit != null && receivingCurrent * receivingTension > maxPower;
+
+        if (isCurrentAboveLimit != isShortCircuited) {
+            isShortCircuited = isCurrentAboveLimit;
+            ShortCircuit(isCurrentAboveLimit);
+        }
+
+        if (currentIsPowered != isPowered) {
+            isPowered = currentIsPowered;
+            SetPowered(currentIsPowered);
         }
     }
-    readonly protected HashSet<BaseGenerator> poweredBy = new();
 }

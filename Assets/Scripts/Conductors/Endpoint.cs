@@ -17,12 +17,13 @@ public class Endpoint : Conductor, IPointerDownHandler, IPointerUpHandler {
             }
             
             if (wire != null) {
-                if (wire.StartConductor != null && wire.StartConductor is Endpoint startConductor) {
+                Wire lastWire = wire;
+                if (lastWire.StartConductor != null && lastWire.StartConductor is Endpoint startConductor) {
                     startConductor.wire = null;
-                } else if (wire.StartConductor != null && wire.StartConductor is Endpoint endConductor) {
+                } else if (lastWire.StartConductor != null && lastWire.StartConductor is Endpoint endConductor) {
                     endConductor.wire = null;
                 }
-                Destroy(wire.gameObject);
+                Destroy(lastWire.gameObject);
             }
             wire = value;
         }
