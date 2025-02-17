@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GoalManager : MonoBehaviour {
     public static GoalManager Singleton;
-    [HideInInspector] public bool isGoalReached = false;
+    public bool isGoalReached = false;
     BaseGoal[] baseGoals;
     void Awake() {
         if (Singleton != null) {
@@ -34,7 +34,7 @@ public class GoalManager : MonoBehaviour {
 
     public void NextStage() {
         Scene currentScene = SceneManager.GetActiveScene();
-        if (currentScene.buildIndex + 1 >= SceneManager.sceneCount) {
+        if (currentScene.buildIndex + 1 >= SceneManager.sceneCountInBuildSettings) {
             return;
         }
         SceneManager.LoadScene(currentScene.buildIndex + 1);

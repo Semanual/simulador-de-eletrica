@@ -22,3 +22,4 @@
 - Todos os valores estão com base no SI, ou seja, potência em Watts, corrente em Ampères, tensão em Volts e resistência em Ohms;
 - Resistores com valores de resistência e tolerância fora da tabela de cores convencional vão ser arredondados (resistência para baixo e tolerância para cima), ou seja, um resistor com valor de 1k315 Ω e tolerância 3% será mostrado como marrom, laranja, marrom (se for resistor de precisão), vermelho (convencional)/marrom (precisão) e dourado;
 - Na prática, no simulador o valor de tolerância não muda em nada no valor do resistor, mas foi mantido para definir a cor da última linha.
+- Há duas fases, para passar de fase acenda o LED sem dar curto circuito.

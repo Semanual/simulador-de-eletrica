@@ -87,7 +87,7 @@ public class Circuit : IElectric, IEnumerable<IElectric> {
             electric.UpdateValues();
         }
 
-        if (associationType == AssociationType.SERIES && remainingElectromotiveForce > 1e-6) {
+        if (associationType == AssociationType.SERIES && remainingElectromotiveForce > 1e-5) {
             Debug.LogError(
                 $"A tensão não foi completamente consumida pelo circuito em série, ou foi usado mais do que havia. O valor calculado está incorreto." +
                 $"\nTensão inicial: {receivingTension}" +
@@ -95,7 +95,7 @@ public class Circuit : IElectric, IEnumerable<IElectric> {
                 $"\nResistência total do circuito: {resistance}" +
                 $"\nComponentes: " + electrics.Select(electric => electric is ElectricComponent component ? $"{component.name}: {electric.receivingTension} V {electric.receivingCurrent} A" : $"Subcircuit: {electric.receivingTension} V {electric.receivingCurrent} A")
             );
-        } else if (associationType == AssociationType.PARALLEL && remainingCurrent > 1e-6 && !float.IsPositiveInfinity(remainingCurrent)) {
+        } else if (associationType == AssociationType.PARALLEL && remainingCurrent > 1e-5 && !float.IsPositiveInfinity(remainingCurrent)) {
             Debug.LogError(
                 $"A corrente não foi completamente consumida pelo circuito em paralelo, ou foi usado mais do que havia. O valor calculado está incorreto." +
                 $"\nCorrente inicial: {receivingCurrent}" +

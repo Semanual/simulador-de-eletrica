@@ -25,7 +25,6 @@ public class Battery : BaseGenerator {
 
     public override void Refresh() {
         Circuit updatedCircuit = GetCircuitFromStartingConductors(GetPoweredOutputEndpoints(), positiveTerminal, negativeTerminal, out _, true);
-        Debug.Log(updatedCircuit.ToDebugString());
         // Limpe os estados dos componentes antigos
         circuit?.Dispose(true);
 
