@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using UnityEngine;
 public class Resistor : ElectricComponent {
     [SerializeField] float tolerance;
@@ -32,7 +34,7 @@ public class Resistor : ElectricComponent {
 
     Dictionary<int, Material> stripeDigitConverter;
     Dictionary<float, Material> stripeMultiplierConverter;
-    Dictionary<float, Material> stripeToleranceConverter;
+    OrderedDictionary stripeToleranceConverter;
 
     protected override void Awake() {
         base.Awake();
@@ -66,7 +68,11 @@ public class Resistor : ElectricComponent {
             { 1000000f, blue },
         };
 
-        stripeToleranceConverter = new Dictionary<float, Material>() {
+        stripeToleranceConverter = new OrderedDictionary() {
+            { 0.0005f, gray },
+            { 0.001f, violet },
+            { 0.0025f, blue },
+            { 0.005f, green },
             { 0.01f, brown },
             { 0.02f, red },
             { 0.05f, gold },
@@ -110,22 +116,19 @@ public class Resistor : ElectricComponent {
         }
 
         float tolerance = this.tolerance;
-        Debug.Log(tolerance);
-        if (tolerance <= 0.01f) {
-            tolerance = 0.01f;
-        }
-        else if (tolerance <= 0.02f) {
-            tolerance = 0.02f;
-        }
-        else if (tolerance <= 0.05f) {
-            tolerance = 0.05f;
-        }
-        else {
-            tolerance = 0.1f;
-        }
+        Material material = black;
 
+        foreach (DictionaryEntry entry in stripeToleranceConverter) {
+            float thisToleranceValue = (float) entry.Key;
+            if (thisToleranceValue > tolerance) {
+                break;
+            }
+
+            material = (Material) entry.Value;
+        }
+        
         if (stripeTolerance) {
-            stripeTolerance.SetMaterials(new() { stripeToleranceConverter.GetValueOrDefault(tolerance) });
+            stripeTolerance.SetMaterials(new() { material });
         }
     }
 

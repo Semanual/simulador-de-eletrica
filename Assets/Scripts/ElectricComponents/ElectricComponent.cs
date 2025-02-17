@@ -20,8 +20,8 @@ public abstract class ElectricComponent : MonoBehaviour, IElectric {
     public float receivingTension { get; set; }
     public float receivingCurrent { get; set; }
     [SerializeField] float maxPower;
-    bool isShortCircuited = false;
-    bool isPowered;
+    [HideInInspector] public bool isShortCircuited = false;
+    [HideInInspector] public bool isPowered;
     public virtual void ShortCircuit(bool isShortCircuited) {}
     public abstract Endpoint[] GetPoweredOutputEndpoints();
     public virtual void SetPowered(bool isPowered) {}
@@ -50,7 +50,7 @@ public abstract class ElectricComponent : MonoBehaviour, IElectric {
                 continue;
             }
 
-            Debug.LogError($"Uso incorreto do atributo EndpointAttribute na variável {field.Name} do componente {GetType().Name}; Só pode ser usado em Endpoints ou coleções de Endpoints");
+            Debug.LogError($"Uso incorreto do atributo EndpointAttribute na variável {field.Name} do componente {GetType().Name} ({gameObject.name}); Só pode ser usado em Endpoints ou coleções de Endpoints");
         }
     }
 

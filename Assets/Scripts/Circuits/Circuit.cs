@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,7 +7,7 @@ public enum AssociationType {
     PARALLEL,
     SERIES
 };
-public class Circuit : IElectric {
+public class Circuit : IElectric, IEnumerable<IElectric> {
     public Circuit(AssociationType associationType, List<IElectric> electrics) {
         this.associationType = associationType;
         this.electrics = electrics;
@@ -56,10 +57,10 @@ public class Circuit : IElectric {
 
     public AssociationType associationType = AssociationType.SERIES;
     public List<IElectric> electrics = new();
-    
+
     public void UpdateValues() {
         float fullResistance = resistance;
-        float remainingElectromotiveForce = receivingTension;
+        float remainingElectromotiveForce = receivingTension + electromotiveForce;
         float remainingCurrent = receivingCurrent;
 
         foreach (IElectric electric in electrics) {
@@ -75,6 +76,8 @@ public class Circuit : IElectric {
             } else {
                 electric.receivingTension = electric.resistance * remainingCurrent;
                 electric.receivingCurrent = remainingCurrent;
+                
+                remainingElectromotiveForce -= electric.receivingTension;
             }
 
             if (electric is ElectricComponent component) {
@@ -84,7 +87,7 @@ public class Circuit : IElectric {
             electric.UpdateValues();
         }
 
-        if (associationType == AssociationType.SERIES && remainingElectromotiveForce != 0) {
+        if (associationType == AssociationType.SERIES && remainingElectromotiveForce > 1e-6) {
             Debug.LogError(
                 $"A tensão não foi completamente consumida pelo circuito em série, ou foi usado mais do que havia. O valor calculado está incorreto." +
                 $"\nTensão inicial: {receivingTension}" +
@@ -92,7 +95,7 @@ public class Circuit : IElectric {
                 $"\nResistência total do circuito: {resistance}" +
                 $"\nComponentes: " + electrics.Select(electric => electric is ElectricComponent component ? $"{component.name}: {electric.receivingTension} V {electric.receivingCurrent} A" : $"Subcircuit: {electric.receivingTension} V {electric.receivingCurrent} A")
             );
-        } else if (associationType == AssociationType.PARALLEL && remainingCurrent != 0 && !float.IsPositiveInfinity(remainingCurrent)) {
+        } else if (associationType == AssociationType.PARALLEL && remainingCurrent > 1e-6 && !float.IsPositiveInfinity(remainingCurrent)) {
             Debug.LogError(
                 $"A corrente não foi completamente consumida pelo circuito em paralelo, ou foi usado mais do que havia. O valor calculado está incorreto." +
                 $"\nCorrente inicial: {receivingCurrent}" +
@@ -116,5 +119,13 @@ public class Circuit : IElectric {
                 subcircuit.Dispose(updateChildrenStates);
             }
         }
+    }
+
+    public IEnumerator<IElectric> GetEnumerator() {
+        return electrics.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+        return electrics.GetEnumerator();
     }
 }

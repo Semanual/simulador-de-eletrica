@@ -26,5 +26,7 @@ public class GeneratorManager : MonoBehaviour {
         foreach (BaseGenerator generator in generators) {
             generator.Refresh();
         }
+
+        GoalManager.Singleton.CheckAllGoals();
     }
 }

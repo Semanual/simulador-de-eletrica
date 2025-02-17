@@ -3,7 +3,7 @@
 - Um simulador de elétrica que (atualmente) funciona com geradores, interruptores, diodos (LED ou não) e resistores (luminosos ou não);
 - - Cada componente é um ElectricComponent, para criar novos componentes basta criar uma classe que herda ElectricComponent e implementar os métodos;
 - Resistores definem suas cores automaticamente a partir da sua resistência;
-- Associação de resistência (série/paralelo) funcional;
+- Associação de resistência (série/paralelo) funcional (misturas complexas de série e paralelo foram proramadas, mas não foram testadas, podem ou não funcionar corretamente);
 - Associação de geradores limitada a geradores em série de mesma polaridade;
 - Callbacks para definir o que fazer quando um componente está em curto circuito;
 - Modelo de circuito a partir de princípios físicos (como lei de Ohm e associação de resistores);

@@ -18,4 +18,11 @@ public static class IElectricExtensions {
 
         return -electric.resistance * current;
     }
+    public static string ToElectricString(this Conductor conductor) {
+        if (conductor is Endpoint endpoint) {
+            return $"{endpoint} ({endpoint.component})";
+        }
+
+        return conductor.ToString();
+    }
 }
